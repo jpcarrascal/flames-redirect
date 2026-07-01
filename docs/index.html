@@ -7,6 +7,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet" />
+
+  <!-- Google Analytics (GA4) — replace G-XXXXXXXXXX with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -121,44 +131,14 @@
 
   <script>
     // ── Analytics ────────────────────────────────────────────────────────────
-    // Change this to your analytics server URL when you deploy it.
-    const ANALYTICS_URL = 'http://localhost:5555/analytics';
-
-    function utmParams() {
-      const p = new URLSearchParams(location.search);
-      return {
-        source:   p.get('utm_source')   || '',
-        medium:   p.get('utm_medium')   || '',
-        campaign: p.get('utm_campaign') || '',
-        content:  p.get('utm_content')  || '',
-      };
-    }
-
-    function beacon(event, extra = {}) {
-      const payload = JSON.stringify({
-        event,
-        ts: new Date().toISOString(),
-        referrer: document.referrer,
-        ua: navigator.userAgent,
-        url: location.href,
-        utm: utmParams(),
-        ...extra,
-      });
-      // sendBeacon is fire-and-forget; falls back to fetch
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(ANALYTICS_URL, new Blob([payload], { type: 'application/json' }));
-      } else {
-        fetch(ANALYTICS_URL, { method: 'POST', body: payload, keepalive: true }).catch(() => {});
-      }
-    }
-
-    // Page view
-    beacon('pageview');
-
-    // Click tracking — log before the browser follows the link
+    // Pageviews are tracked automatically by the gtag('config', ...) call above.
+    // Click tracking — fire a GA4 event before the browser follows the link.
     document.querySelectorAll('.link-btn').forEach(a => {
       a.addEventListener('click', () => {
-        beacon('click', { label: a.dataset.label, href: a.href });
+        gtag('event', 'link_click', {
+          label: a.dataset.label,
+          href: a.href,
+        });
       });
     });
   </script>
