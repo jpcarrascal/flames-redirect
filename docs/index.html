@@ -1,1 +1,166 @@
-<html>Hello</html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flames of Foe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #ff4545;
+      --white: #ffffff;
+      --dark: #1a0000;
+    }
+
+    body {
+      min-height: 100dvh;
+      background-color: var(--red);
+      background-image:
+        radial-gradient(ellipse at 50% 0%, rgba(255,120,60,0.45) 0%, transparent 65%),
+        radial-gradient(ellipse at 50% 100%, rgba(120,0,0,0.6) 0%, transparent 70%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1.25rem;
+      font-family: 'Montserrat', sans-serif;
+      color: var(--white);
+    }
+
+    .logo {
+      width: min(280px, 72vw);
+      margin-bottom: 2.75rem;
+      filter: brightness(0) invert(1);
+      user-select: none;
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .link-btn {
+      display: block;
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: rgba(255,255,255,0.12);
+      border: 2px solid rgba(255,255,255,0.85);
+      border-radius: 3px;
+      color: var(--white);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .link-btn:hover {
+      background: rgba(255,255,255,0.24);
+    }
+
+    .link-btn:active {
+      transform: scale(0.97);
+      background: rgba(255,255,255,0.32);
+    }
+
+    .link-btn.featured {
+      background: var(--white);
+      color: var(--red);
+      border-color: var(--white);
+    }
+
+    .link-btn.featured:hover {
+      background: rgba(255,255,255,0.88);
+    }
+
+    footer {
+      margin-top: 3rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.45;
+    }
+  </style>
+</head>
+<body>
+  <img
+    class="logo"
+    src="https://flamesoffoe.com/assets/flamesOK_tipo.png"
+    alt="Flames of Foe"
+  />
+
+  <div class="links">
+    <a class="link-btn" href="https://salavol.com/agenda/flames-of-foe-zharzha" data-label="tickets-barcelona" target="_blank" rel="noopener">
+      Entrades Sala VOL — Barcelona
+    </a>
+    <a class="link-btn" href="https://ticketeus.com/es/events/mad-psych-fest-aldeaquemada-flames-of-foe" data-label="tickets-madrid" target="_blank" rel="noopener">
+      Entradas Barracudas — Madrid
+    </a>
+    <a class="link-btn" href="https://entradium.com/events/flames-of-foe" data-label="tickets-zaragoza" target="_blank" rel="noopener">
+      Entradas Ley Seca — Zaragoza
+    </a>
+    <a class="link-btn featured" href="https://flamesoffoe.bandcamp.com/album/tendrils-2" data-label="tendrils-lp" target="_blank" rel="noopener">
+      Tendrils LP
+    </a>
+  </div>
+
+  <footer>flamesoffoe.com</footer>
+
+  <script>
+    // ── Analytics ────────────────────────────────────────────────────────────
+    // Change this to your analytics server URL when you deploy it.
+    const ANALYTICS_URL = 'http://localhost:5555/analytics';
+
+    function utmParams() {
+      const p = new URLSearchParams(location.search);
+      return {
+        source:   p.get('utm_source')   || '',
+        medium:   p.get('utm_medium')   || '',
+        campaign: p.get('utm_campaign') || '',
+        content:  p.get('utm_content')  || '',
+      };
+    }
+
+    function beacon(event, extra = {}) {
+      const payload = JSON.stringify({
+        event,
+        ts: new Date().toISOString(),
+        referrer: document.referrer,
+        ua: navigator.userAgent,
+        url: location.href,
+        utm: utmParams(),
+        ...extra,
+      });
+      // sendBeacon is fire-and-forget; falls back to fetch
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(ANALYTICS_URL, new Blob([payload], { type: 'application/json' }));
+      } else {
+        fetch(ANALYTICS_URL, { method: 'POST', body: payload, keepalive: true }).catch(() => {});
+      }
+    }
+
+    // Page view
+    beacon('pageview');
+
+    // Click tracking — log before the browser follows the link
+    document.querySelectorAll('.link-btn').forEach(a => {
+      a.addEventListener('click', () => {
+        beacon('click', { label: a.dataset.label, href: a.href });
+      });
+    });
+  </script>
+</body>
+</html>
